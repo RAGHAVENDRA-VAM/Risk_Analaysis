@@ -379,3 +379,17 @@ class PipelineRules:
 
 
         return findings
+
+
+def _execute_pipeline_rules(file_content: str, file_path: str):
+    instance = PipelineRules()
+    return instance.evaluate({"files": [{"path": file_path, "content": file_content, "category": "pipeline"}]})
+
+
+pipeline_rules = [
+    {
+        "name": "Pipeline Security Rules",
+        "category": "CI/CD",
+        "executor": _execute_pipeline_rules
+    }
+]

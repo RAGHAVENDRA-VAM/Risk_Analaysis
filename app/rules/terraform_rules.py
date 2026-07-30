@@ -454,3 +454,17 @@ class TerraformRules:
 
 
         return findings
+
+
+def _execute_terraform_rules(file_content: str, file_path: str):
+    instance = TerraformRules()
+    return instance.evaluate({"files": [{"path": file_path, "content": file_content, "category": "terraform"}]})
+
+
+terraform_rules = [
+    {
+        "name": "Terraform Security Rules",
+        "category": "Infrastructure",
+        "executor": _execute_terraform_rules
+    }
+]

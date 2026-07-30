@@ -420,3 +420,17 @@ class KubernetesRules:
 
 
         return findings
+
+
+def _execute_kubernetes_rules(file_content: str, file_path: str):
+    instance = KubernetesRules()
+    return instance.evaluate({"files": [{"path": file_path, "content": file_content, "category": "kubernetes"}]})
+
+
+kubernetes_rules = [
+    {
+        "name": "Kubernetes Security Rules",
+        "category": "Kubernetes",
+        "executor": _execute_kubernetes_rules
+    }
+]

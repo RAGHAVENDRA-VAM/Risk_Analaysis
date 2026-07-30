@@ -373,8 +373,6 @@ class SecurityRules:
 
 
 
-
-
     def check_debug_mode(
         self,
         path: str,
@@ -448,3 +446,17 @@ class SecurityRules:
 
 
         return findings
+
+
+def _execute_security_rules(file_content: str, file_path: str):
+    instance = SecurityRules()
+    return instance.evaluate({"files": [{"path": file_path, "content": file_content}]})
+
+
+security_rules = [
+    {
+        "name": "Security Rules",
+        "category": "Security",
+        "executor": _execute_security_rules
+    }
+]
