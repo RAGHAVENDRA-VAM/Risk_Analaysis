@@ -1,239 +1,73 @@
-from fastapi import (
-    Request,
-    HTTPException
-)
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+from fastapi import Request
+
+from app.core.security import decode_access_token
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
-from starlette.middleware.base import (
-    BaseHTTPMiddleware
-)
-
-
-from app.core.security import (
-    decode_access_token
-)
-
-
-from app.core.logging import (
-    get_logger
-)
-
-
-
-
-
-logger = get_logger(
-    __name__
-)
-
-
-
-
-
-class AuthMiddleware(
-    BaseHTTPMiddleware
-):
-
-    """
-    JWT authentication middleware.
-    """
-
-
-
-    #
-    # Public endpoints
-    #
+class AuthMiddleware(BaseHTTPMiddleware):
 
     PUBLIC_PATHS = [
-
         "/",
-
         "/health",
-
+        "/favicon.ico",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
         "/auth/login",
-
         "/auth/register",
-
-        "/auth/health"
-
+        "/auth/health",
     ]
 
+    PUBLIC_PREFIXES = [
+        "/webhook/",
+        "/risk/",
+        "/dashboard",
+    ]
 
-
-
-
-    async def dispatch(
-        self,
-        request: Request,
-        call_next
-    ):
-
+    async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
+        if path in self.PUBLIC_PATHS or any(path.startswith(p) for p in self.PUBLIC_PREFIXES):
+            return await call_next(request)
 
-
-        #
-        # Allow public APIs
-        #
-
-        if path in self.PUBLIC_PATHS:
-
-
-            return await call_next(
-
-                request
-
-            )
-
-
-
-
-
-        #
-        # Read Authorization Header
-        #
-
-        auth_header = request.headers.get(
-
-            "Authorization"
-
-        )
-
-
+        auth_header = request.headers.get("Authorization")
 
         if not auth_header:
-
-
-            logger.warning(
-
-                f"Missing token for {path}"
-
-            )
-
-
-            raise HTTPException(
-
+            logger.warning(f"Missing token for {path}")
+            return JSONResponse(
                 status_code=401,
-
-                detail="Authorization token required"
-
+                content={"detail": "Authorization token required"}
             )
-
-
-
-
 
         try:
-
-
-            scheme, token = (
-
-                auth_header.split()
-
-            )
-
-
+            scheme, token = auth_header.split()
             if scheme.lower() != "bearer":
-
-
-                raise Exception()
-
-
-
-
+                raise ValueError()
         except Exception:
-
-
-            raise HTTPException(
-
+            return JSONResponse(
                 status_code=401,
-
-                detail="Invalid authorization format"
-
+                content={"detail": "Invalid authorization format"}
             )
 
-
-
-
-
-        #
-        # Validate JWT
-        #
-
-        payload = decode_access_token(
-
-            token
-
-        )
-
-
+        payload = decode_access_token(token)
 
         if not payload:
-
-
-            logger.warning(
-
-                "Invalid JWT token"
-
-            )
-
-
-            raise HTTPException(
-
+            logger.warning("Invalid JWT token")
+            return JSONResponse(
                 status_code=401,
-
-                detail="Invalid token"
-
+                content={"detail": "Invalid token"}
             )
-
-
-
-
-
-        #
-        # Attach user information
-        #
 
         request.state.user = {
-
-
-            "username":
-
-                payload.get(
-                    "sub"
-                ),
-
-
-            "role":
-
-                payload.get(
-                    "role"
-                ),
-
-
-            "type":
-
-                payload.get(
-                    "type"
-                )
-
+            "username": payload.get("sub"),
+            "role": payload.get("role"),
+            "type": payload.get("type")
         }
 
+        logger.info(f"Authenticated user: {request.state.user['username']}")
 
-
-
-
-        logger.info(
-
-            f"Authenticated user: "
-            f"{request.state.user['username']}"
-
-        )
-
-
-
-        return await call_next(
-
-            request
-
-        )
+        return await call_next(request)
