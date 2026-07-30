@@ -1,0 +1,185 @@
+2026-07-30 12:12:29,537 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:13:36,459 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:47:13,794 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:48:26,829 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:49:47,097 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:50:38,945 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 12:51:12,553 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:04:40,140 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:18:02,056 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:19:05,343 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:19:34,680 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:19:48,418 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:21:44,292 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:21:55,385 | INFO | app.main | Database initialized
+2026-07-30 14:22:00,921 | INFO | app.main | Starting AI DevOps Risk Platform...
+2026-07-30 14:22:06,688 | INFO | app.main | Database initialized
+2026-07-30 14:25:01,353 | WARNING | app.middleware.auth_middleware | Missing token for /favicon.ico
+2026-07-30 14:25:01,356 | ERROR | app.middleware.error_handler | Unhandled exception for /favicon.ico: 401: Authorization token required
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 183, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    |     raise HTTPException(
+    |     ...<5 lines>...
+    |     )
+    | fastapi.exceptions.HTTPException: 401: Authorization token required
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    raise HTTPException(
+    ...<5 lines>...
+    )
+fastapi.exceptions.HTTPException: 401: Authorization token required
+2026-07-30 14:25:14,375 | WARNING | app.middleware.auth_middleware | Missing token for /docs
+2026-07-30 14:25:14,377 | ERROR | app.middleware.error_handler | Unhandled exception for /docs: 401: Authorization token required
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 183, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    |     raise HTTPException(
+    |     ...<5 lines>...
+    |     )
+    | fastapi.exceptions.HTTPException: 401: Authorization token required
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    raise HTTPException(
+    ...<5 lines>...
+    )
+fastapi.exceptions.HTTPException: 401: Authorization token required
+2026-07-30 14:25:14,876 | WARNING | app.middleware.auth_middleware | Missing token for /favicon.ico
+2026-07-30 14:25:14,879 | ERROR | app.middleware.error_handler | Unhandled exception for /favicon.ico: 401: Authorization token required
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 183, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    |     raise HTTPException(
+    |     ...<5 lines>...
+    |     )
+    | fastapi.exceptions.HTTPException: 401: Authorization token required
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 182, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "c:\Projects\azure-devops-risk-analyzer\.venv\Lib\site-packages\starlette\middleware\base.py", line 184, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Projects\azure-devops-risk-analyzer\backend\app\middleware\auth_middleware.py", line 114, in dispatch
+    raise HTTPException(
+    ...<5 lines>...
+    )
+fastapi.exceptions.HTTPException: 401: Authorization token required
+2026-07-30 14:29:36,597 | INFO | app.main | Stopping AI DevOps Risk Platform...
