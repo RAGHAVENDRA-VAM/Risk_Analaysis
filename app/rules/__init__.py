@@ -34,6 +34,7 @@ from app.rules.pipeline_rules import (
 from app.rules.coding_rules import (
     coding_rules
 )
+from app.rules.platform_rules import platform_rules
 
 
 
@@ -51,7 +52,8 @@ ALL_RULES = [
 
     *pipeline_rules,
 
-    *coding_rules
+    *coding_rules,
+    *platform_rules
 
 ]
 

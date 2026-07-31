@@ -228,7 +228,12 @@ class RecommendationGenerator:
 
             "recommendations":
 
-                recommendations
+                recommendations,
+
+            "estimated_fix_time": "15-30 minutes" if finding.get("severity") in {"Critical", "High", "CRITICAL", "HIGH"} else "5-15 minutes",
+            "compliance": ["CIS", "OWASP", "SOC 2"],
+            "reference_links": [],
+            "suggested_code_fix": finding.get("suggested_code_fix")
 
         }
 

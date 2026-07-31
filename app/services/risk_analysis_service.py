@@ -4,6 +4,7 @@ from app.services.rule_engine_service import RuleEngineService
 from app.services.genai_risk_analyzer_service import GenAIRiskAnalyzer
 from app.services.risk_aggregator import RiskAggregator
 from app.services.recommendation_generator import RecommendationGenerator
+from app.agents import CoordinatorAgent
 
 
 class RiskAnalysisService:
@@ -27,6 +28,7 @@ class RiskAnalysisService:
         self.ai_analyzer = GenAIRiskAnalyzer()
         self.risk_aggregator = RiskAggregator()
         self.recommendation_generator = RecommendationGenerator()
+        self.coordinator = CoordinatorAgent()
 
     def analyze_commit(
         self,
@@ -58,6 +60,7 @@ class RiskAnalysisService:
             rule_result.get("findings", []),
             ai_result
         )
+        agent_summary = self.coordinator.coordinate(rule_result.get("findings", []))
 
         return {
             "commit_id": commit_id,
@@ -68,6 +71,7 @@ class RiskAnalysisService:
             "findings": rule_result.get("findings", []),
             "ai_analysis": ai_result,
             "recommendations": recommendations,
+            "agent_summary": agent_summary,
             "created_at": datetime.utcnow()
         }
 

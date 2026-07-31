@@ -13,21 +13,25 @@ class AnalysisResponseService:
         return int(finding.get("line_number") or finding.get("line") or 1)
 
     def to_client_response(self, result: dict[str, Any]) -> dict[str, Any]:
+        recommendation_by_rule = {item.get("rule"): item for item in result.get("recommendations", [])}
         findings = []
         for index, finding in enumerate(result.get("findings", []), start=1):
+            recommendation = recommendation_by_rule.get(finding.get("rule") or finding.get("rule_name"), {})
             findings.append({
                 "id": finding.get("id", index),
                 "severity": finding.get("severity", "Low"),
                 "ruleName": finding.get("rule") or finding.get("rule_name", "AI_REVIEW"),
                 "category": finding.get("rule_category") or finding.get("category", "Security"),
-                "filePath": finding.get("file_path") or finding.get("path", ""),
+                "filePath": finding.get("file_path") or finding.get("file") or finding.get("path", ""),
                 "lineNumber": self._line_number(finding),
                 "title": finding.get("title") or finding.get("rule", "Risk finding"),
                 "description": finding.get("description", ""),
-                "businessImpact": finding.get("business_impact", "Review before deployment."),
-                "recommendation": finding.get("recommendation", "Review the recommended remediation."),
-                "suggestedCodeFix": finding.get("suggested_code_fix"),
-                "referenceLinks": finding.get("reference_links", []),
+                "businessImpact": finding.get("business_impact", "Potential production security or reliability impact."),
+                "compliance": recommendation.get("compliance", ["CIS", "OWASP"]),
+                "estimatedFixTime": recommendation.get("estimated_fix_time", "15 minutes"),
+                "recommendation": finding.get("recommendation") or "\n".join(recommendation.get("recommendations", ["Review the recommended remediation."])),
+                "suggestedCodeFix": finding.get("suggested_code_fix") or recommendation.get("suggested_code_fix"),
+                "referenceLinks": finding.get("reference_links") or recommendation.get("reference_links", []),
             })
 
         summary = {severity: 0 for severity in ("critical", "high", "medium", "low")}
@@ -45,7 +49,20 @@ class AnalysisResponseService:
             "summary": summary,
             "findings": findings,
             "recommendations": result.get("recommendations", []),
+            "scores": self._category_scores(findings),
+            "agentSummary": result.get("agent_summary", {}),
         }
+
+    @staticmethod
+    def _category_scores(findings: list[dict[str, Any]]) -> dict[str, int]:
+        """Client dashboard score by broad platform area."""
+        scores = {"security": 0, "terraform": 0, "pipeline": 0, "kubernetes": 0, "docker": 0}
+        for finding in findings:
+            category = finding["category"].lower()
+            key = "security" if category == "security" else "terraform" if category == "infrastructure" else "pipeline" if category in {"ci/cd", "pipeline"} else "kubernetes" if category == "kubernetes" else "docker" if "docker" in finding["filePath"].lower() else None
+            if key:
+                scores[key] = max(scores[key], 100 if finding["severity"] in {"Critical", "High"} else 60 if finding["severity"] == "Medium" else 25)
+        return scores
 
 
 analysis_response_service = AnalysisResponseService()

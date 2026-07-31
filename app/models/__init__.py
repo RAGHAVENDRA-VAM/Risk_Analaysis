@@ -13,6 +13,7 @@ from app.models.risk_analysis import RiskAnalysis
 from app.models.risk_finding import RiskFinding
 from app.models.recommendation import Recommendation
 from app.models.audit_log import AuditLog
+from app.models.analysis_history import AnalysisHistory
 
 __all__ = [
     "Commit",
@@ -21,5 +22,6 @@ __all__ = [
     "RiskAnalysis",
     "RiskFinding",
     "Recommendation",
-    "AuditLog"
+    "AuditLog",
+    "AnalysisHistory"
 ]

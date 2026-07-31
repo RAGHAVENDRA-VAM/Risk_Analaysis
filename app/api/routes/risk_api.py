@@ -34,6 +34,7 @@ from app.core.logging import (
 from app.services.risk_analysis_service import risk_analysis_service
 from app.services.analysis_cache_service import analysis_cache_service
 from app.services.analysis_response_service import analysis_response_service
+from app.repositories.analysis_history_repository import AnalysisHistoryRepository
 
 
 logger = get_logger(
@@ -110,7 +111,7 @@ async def analyze_pull_request(request: PRAnalyzeRequest, db=Depends(get_db)):
 
 
 @router.post("/editor/analyze")
-async def analyze_editor_changes(request: EditorAnalyzeRequest):
+async def analyze_editor_changes(request: EditorAnalyzeRequest, db=Depends(get_db)):
     """Analyze only editor-supplied changes without creating database history."""
     files = [file.model_dump() for file in request.files if file.change_type != "deleted"]
     cache_key = analysis_cache_service.key(f"{request.workspace}:{request.branch}", files)
@@ -121,7 +122,18 @@ async def analyze_editor_changes(request: EditorAnalyzeRequest):
     result = risk_analysis_service.analyze_commit(cache_key, request.branch, files)
     response = {**analysis_response_service.to_client_response(result), "cached": False}
     analysis_cache_service.set(cache_key, response)
+    AnalysisHistoryRepository(db).save("editor", request.workspace, result, request.workspace, request.branch)
     return response
+
+
+@router.get("/history")
+async def get_analysis_history(repository: str | None = None, limit: int = 50, db=Depends(get_db)):
+    """History used by both VS Code and Azure DevOps display clients."""
+    records = AnalysisHistoryRepository(db).list(repository, limit)
+    return {"items": [{"id": item.id, "type": item.analysis_type, "subjectId": item.subject_id,
+                        "repository": item.repository_name, "branch": item.branch_name, "riskScore": item.risk_score,
+                        "severity": item.severity, "decision": item.decision, "confidence": item.confidence,
+                        "createdAt": item.created_at} for item in records]}
 
 
 

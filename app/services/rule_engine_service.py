@@ -206,6 +206,14 @@ class RuleEngineService:
                         rule
                     )
 
+            elif category == "Container":
+                if os.path.basename(file_path).lower() == "dockerfile":
+                    selected_rules.append(rule)
+
+            elif category == "Cloud":
+                if extension in [".bicep", ".json", ".sh", ".ps1"] or "ansible" in file_path.lower() or "jenkinsfile" in file_path.lower():
+                    selected_rules.append(rule)
+
 
 
         return selected_rules

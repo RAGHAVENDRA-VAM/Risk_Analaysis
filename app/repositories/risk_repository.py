@@ -87,7 +87,7 @@ class RiskRepository:
         for finding in findings:
             risk_finding = RiskFinding(
                 commit_id=commit_id,
-                file_path=finding.get("file_path"),
+                file_path=finding.get("file_path") or finding.get("file") or finding.get("path"),
                 rule_name=(
                     finding.get("rule")
                     or finding.get("rule_name")
