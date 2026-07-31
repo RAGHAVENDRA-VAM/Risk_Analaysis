@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime
 )
 
+from sqlalchemy.orm import relationship
 
 from sqlalchemy.sql import (
     func
@@ -127,4 +128,18 @@ class Commit(Base):
 
         onupdate=func.now()
 
+    )
+
+
+    file_changes = relationship(
+        "FileChange",
+        back_populates="commit",
+        cascade="all, delete-orphan"
+    )
+
+
+    rule_results = relationship(
+        "RuleResult",
+        back_populates="commit",
+        cascade="all, delete-orphan"
     )
