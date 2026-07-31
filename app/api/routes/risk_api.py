@@ -244,22 +244,28 @@ async def get_findings(
 
     )
 
-
+    findings_response = [
+        {
+            "id": finding.id,
+            "commit_id": finding.commit_id,
+            "file_path": finding.file_path,
+            "rule_name": finding.rule_name,
+            "category": finding.category,
+            "title": finding.title,
+            "description": finding.description,
+            "severity": finding.severity,
+            "risk_score": finding.risk_score,
+            "status": finding.status,
+            "created_at": finding.created_at
+        }
+        for finding in findings
+    ]
 
     return {
 
-
-        "commit_id":
-
-            commit_id,
-
-
-        "findings":
-
-            findings
-
+        "commit_id": commit_id,
+        "findings": findings_response
     }
-
 
 
 
@@ -294,16 +300,23 @@ async def get_recommendations(
 
 
 
+    recommendations_response = [
+        {
+            "id": recommendation.id,
+            "finding_id": recommendation.finding_id,
+            "commit_id": recommendation.commit_id,
+            "title": recommendation.title,
+            "description": recommendation.description,
+            "remediation_steps": recommendation.remediation_steps,
+            "priority": recommendation.priority,
+            "status": recommendation.status,
+            "created_at": recommendation.created_at,
+            "updated_at": recommendation.updated_at
+        }
+        for recommendation in recommendations
+    ]
+
     return {
-
-
-        "commit_id":
-
-            commit_id,
-
-
-        "recommendations":
-
-            recommendations
-
+        "commit_id": commit_id,
+        "recommendations": recommendations_response
     }

@@ -49,7 +49,7 @@ class CommitProcessorService:
 
         # Step 3 - Prepare risk analysis input
         analysis_request = {
-            "commit_id": commit.id,
+            "commit_id": commit.commit_id,
             "context": context
         }
 
