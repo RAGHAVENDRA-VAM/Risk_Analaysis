@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
 from app.core.logging import get_logger
+import app.models  # noqa: F401 - registers all models with SQLAlchemy
 from app.middleware.auth_middleware import AuthMiddleware
 from app.middleware.error_handler import register_exception_handlers
 from app.api.routes.webhook_api import router as webhook_router

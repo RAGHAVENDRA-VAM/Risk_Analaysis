@@ -82,6 +82,12 @@ class FileChange(Base):
         back_populates="file_changes"
     )
 
+    rule_results = relationship(
+        "RuleResult",
+        back_populates="file",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self) -> str:
         return (
             f"<FileChange("
