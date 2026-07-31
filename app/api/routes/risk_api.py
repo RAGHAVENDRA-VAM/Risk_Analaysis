@@ -4,7 +4,8 @@ from fastapi import (
     Depends
 )
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Literal
 
 from app.repositories.risk_repository import (
     RiskRepository
@@ -31,6 +32,8 @@ from app.core.logging import (
 )
 
 from app.services.risk_analysis_service import risk_analysis_service
+from app.services.analysis_cache_service import analysis_cache_service
+from app.services.analysis_response_service import analysis_response_service
 
 
 logger = get_logger(
@@ -47,6 +50,12 @@ router = APIRouter(
 )
 
 
+class ChangedFile(BaseModel):
+    path: str = Field(min_length=1, max_length=500)
+    content: str = Field(max_length=1_000_000)
+    change_type: Literal["added", "modified", "deleted"] = "modified"
+
+
 class PRAnalyzeRequest(BaseModel):
     project: str
     repository: str
@@ -56,7 +65,13 @@ class PRAnalyzeRequest(BaseModel):
     targetBranch: str
     organization: str
     user: str
-    files: list = []
+    files: list[ChangedFile] = Field(default_factory=list, max_length=200)
+
+
+class EditorAnalyzeRequest(BaseModel):
+    workspace: str = Field(min_length=1, max_length=500)
+    branch: str = Field(default="local", max_length=250)
+    files: list[ChangedFile] = Field(min_length=1, max_length=50)
 
 
 @router.post("/analyze")
@@ -70,7 +85,7 @@ async def analyze_pull_request(request: PRAnalyzeRequest, db=Depends(get_db)):
             pull_request_id=str(request.pullRequestId),
             repository=request.repository,
             branch=request.sourceBranch,
-            changed_files=request.files
+            changed_files=[file.model_dump() for file in request.files]
         )
 
         repository = RiskRepository(db)
@@ -88,25 +103,25 @@ async def analyze_pull_request(request: PRAnalyzeRequest, db=Depends(get_db)):
             finding_lookup
         )
 
-        return {
-            "riskScore": result["risk_score"],
-            "severity": result["severity"],
-            "decision": result["decision"],
-            "confidence": result.get("ai_analysis", {}).get("confidence", 0.0),
-            "analysisTime": 0,
-            "engine": "rule+ai",
-            "summary": {
-                "critical": sum(1 for f in result["findings"] if f.get("severity") == "Critical"),
-                "high": sum(1 for f in result["findings"] if f.get("severity") == "High"),
-                "medium": sum(1 for f in result["findings"] if f.get("severity") == "Medium"),
-                "low": sum(1 for f in result["findings"] if f.get("severity") == "Low")
-            },
-            "findings": result["findings"],
-            "recommendations": result["recommendations"]
-        }
+        return analysis_response_service.to_client_response(result)
     except Exception as e:
         logger.error(f"PR analysis failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/editor/analyze")
+async def analyze_editor_changes(request: EditorAnalyzeRequest):
+    """Analyze only editor-supplied changes without creating database history."""
+    files = [file.model_dump() for file in request.files if file.change_type != "deleted"]
+    cache_key = analysis_cache_service.key(f"{request.workspace}:{request.branch}", files)
+    cached = analysis_cache_service.get(cache_key)
+    if cached:
+        return {**cached, "cached": True}
+
+    result = risk_analysis_service.analyze_commit(cache_key, request.branch, files)
+    response = {**analysis_response_service.to_client_response(result), "cached": False}
+    analysis_cache_service.set(cache_key, response)
+    return response
 
 
 

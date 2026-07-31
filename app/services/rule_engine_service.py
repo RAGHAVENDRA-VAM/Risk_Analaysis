@@ -328,10 +328,7 @@ class RuleEngineService:
 
         total_score = sum(
 
-            item.get(
-                "risk_score",
-                0
-            )
+            item.get("score", item.get("risk_score", 0))
 
             for item in findings
 

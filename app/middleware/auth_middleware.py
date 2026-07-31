@@ -1,9 +1,11 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from fastapi import Request
+from hmac import compare_digest
 
 from app.core.security import decode_access_token
 from app.core.logging import get_logger
+from app.core.config import settings
 
 logger = get_logger(__name__)
 
@@ -22,14 +24,18 @@ class AuthMiddleware(BaseHTTPMiddleware):
         "/auth/health",
     ]
 
-    PUBLIC_PREFIXES = [
-        "/webhook/",
-        "/risk/",
-        "/dashboard",
-    ]
+    PUBLIC_PREFIXES = []
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
+
+        # Azure DevOps service hooks cannot issue our JWT.  A deployment may
+        # explicitly opt into a dedicated shared secret for this one endpoint.
+        if path == "/webhook/azure-devops" and settings.AZURE_DEVOPS_WEBHOOK_SECRET:
+            supplied_secret = request.headers.get("X-Azure-DevOps-Webhook-Secret", "")
+            if compare_digest(supplied_secret, settings.AZURE_DEVOPS_WEBHOOK_SECRET):
+                return await call_next(request)
+            return JSONResponse(status_code=401, content={"detail": "Invalid webhook secret"})
 
         if path in self.PUBLIC_PATHS or any(path.startswith(p) for p in self.PUBLIC_PREFIXES):
             return await call_next(request)

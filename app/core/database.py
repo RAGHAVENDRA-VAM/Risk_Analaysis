@@ -44,9 +44,7 @@ engine = create_engine(
     echo=False,
 
 
-    connect_args={
-        "sslmode": "require"
-    }
+    connect_args={"sslmode": settings.DATABASE_SSL_MODE}
 
 )
 

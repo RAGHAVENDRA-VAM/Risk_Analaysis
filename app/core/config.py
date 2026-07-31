@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import quote_plus
 
 
 from pydantic_settings import (
@@ -69,11 +70,7 @@ class Settings(
     )
 
 
-    DATABASE_NAME: str = (
-
-        "devops_risk_db"
-
-    )
+    DATABASE_NAME: str = "risk_analyzer_db"
 
 
     DATABASE_USER: str = (
@@ -83,11 +80,9 @@ class Settings(
     )
 
 
-    DATABASE_PASSWORD: str = (
+    DATABASE_PASSWORD: str = "postgres"
 
-        "postgres"
-
-    )
+    DATABASE_SSL_MODE: str = "prefer"
 
 
 
@@ -101,7 +96,7 @@ class Settings(
 
             f"postgresql://"
             f"{self.DATABASE_USER}:"
-            f"{self.DATABASE_PASSWORD}@"
+            f"{quote_plus(self.DATABASE_PASSWORD)}@"
             f"{self.DATABASE_HOST}:"
             f"{self.DATABASE_PORT}/"
             f"{self.DATABASE_NAME}"
@@ -143,11 +138,7 @@ class Settings(
     # Security
     #
 
-    JWT_SECRET_KEY: str = (
-
-        "change-this-secret"
-
-    )
+    JWT_SECRET_KEY: str = ""
 
 
     JWT_ALGORITHM: str = (
@@ -172,9 +163,10 @@ class Settings(
     #
 
     GITHUB_WEBHOOK_SECRET: str = ""
-
-
     AZURE_DEVOPS_WEBHOOK_SECRET: str = ""
+    AZURE_DEVOPS_PAT: str = ""
+    AZURE_DEVOPS_ORGANIZATION: str = ""
+    CORS_ORIGINS: str = ""
 
 
 

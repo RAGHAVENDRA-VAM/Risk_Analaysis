@@ -12,6 +12,7 @@ from app.middleware.error_handler import register_exception_handlers
 from app.api.routes.webhook_api import router as webhook_router
 from app.api.routes.risk_api import router as risk_router
 from app.api.routes.dashboard_api import router as dashboard_router
+from app.core.config import settings
 
 logger = get_logger(__name__)
 
@@ -19,6 +20,8 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting AI DevOps Risk Platform...")
+    if settings.ENVIRONMENT.lower() in {"production", "prod"} and not settings.JWT_SECRET_KEY:
+        raise RuntimeError("JWT_SECRET_KEY must be configured in production")
     Base.metadata.create_all(bind=engine)
     logger.info("Database initialized")
     yield
@@ -44,8 +47,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
 )
