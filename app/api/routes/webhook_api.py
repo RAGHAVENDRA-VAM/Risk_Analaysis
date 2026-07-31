@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from typing import Any, Dict
+
 from app.services.commit_processor_service import CommitProcessorService
 from app.services.risk_analysis_service import risk_analysis_service
 from app.core.logging import get_logger
@@ -9,32 +12,34 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/webhook", tags=["Webhook"])
 
 
+class WebhookPayload(BaseModel):
+    eventType: str = ""
+    resource: Dict[str, Any] = {}
+
+
 @router.post("/azure-devops")
-async def azure_devops_webhook(request: Request, db=Depends(get_db)):
+async def azure_devops_webhook(payload: WebhookPayload, db=Depends(get_db)):
     try:
-        payload = await request.json()
-        event_type = payload.get("eventType", "")
+        event_type = payload.eventType
+        resource = payload.resource
 
         logger.info(f"Azure DevOps event received: {event_type}")
 
         if event_type == "git.push":
-            return handle_push(payload, db)
+            return handle_push(resource, db)
 
         elif event_type in ("git.pullrequest.created", "git.pullrequest.updated"):
-            return handle_pull_request(payload)
+            return handle_pull_request(resource)
 
         else:
-            # Unknown or test event — return 200 so Azure DevOps marks hook as healthy
             return {"status": "ok", "event_type": event_type}
 
     except Exception as error:
         logger.error(f"Webhook error: {error}")
-        # Still return 200 so Azure DevOps does not mark the hook as failed
         return {"status": "error", "detail": str(error)}
 
 
-def handle_push(payload: dict, db):
-    resource = payload.get("resource", {})
+def handle_push(resource: dict, db):
     commits = resource.get("commits", [])
 
     if not commits:
@@ -59,8 +64,7 @@ def handle_push(payload: dict, db):
         return {"status": "error", "detail": str(e)}
 
 
-def handle_pull_request(payload: dict):
-    resource = payload.get("resource", {})
+def handle_pull_request(resource: dict):
     pr_id = resource.get("pullRequestId")
     repository = resource.get("repository", {}).get("name", "")
     source_branch = resource.get("sourceRefName", "")
