@@ -1,3 +1,5 @@
+from typing import Dict, List, Optional
+
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 
@@ -32,6 +34,42 @@ class RecommendationRepository:
             .order_by(desc(Recommendation.created_at))
             .all()
         )
+
+    def save_recommendations(
+        self,
+        commit_id: str,
+        recommendations: list,
+        finding_lookup: Optional[Dict[str, int]] = None
+    ) -> list:
+        finding_lookup = finding_lookup or {}
+        saved_recommendations = []
+
+        for recommendation in recommendations:
+            remediation_steps = recommendation.get("recommendations")
+            if isinstance(remediation_steps, list):
+                remediation_steps = "\n".join(remediation_steps)
+
+            saved_recommendation = Recommendation(
+                finding_id=
+                    finding_lookup.get(
+                        recommendation.get("rule"),
+                        0
+                    ),
+                commit_id=commit_id,
+                title=(
+                    recommendation.get("issue")
+                    or recommendation.get("rule")
+                ),
+                description=recommendation.get("description", ""),
+                remediation_steps=remediation_steps,
+                priority=recommendation.get("severity", "Medium")
+            )
+
+            self.db.add(saved_recommendation)
+            saved_recommendations.append(saved_recommendation)
+
+        self.db.commit()
+        return saved_recommendations
 
     def get_pending(self) -> list:
         return (

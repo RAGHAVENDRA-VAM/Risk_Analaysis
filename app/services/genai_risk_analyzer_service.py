@@ -1,21 +1,18 @@
 import json
-
+from urllib.parse import urlparse
 
 from typing import (
     Dict,
     List
 )
 
-
 from app.core.config import (
     settings
 )
 
-
 from app.core.logging import (
     get_logger
 )
-
 
 from openai import AzureOpenAI
 
@@ -44,7 +41,11 @@ class GenAIRiskAnalyzer:
 
             azure_endpoint=
 
-                settings.AZURE_OPENAI_ENDPOINT,
+                self._normalize_endpoint(
+
+                    settings.AZURE_OPENAI_ENDPOINT
+
+                ),
 
 
             api_key=
@@ -64,6 +65,29 @@ class GenAIRiskAnalyzer:
             settings.AZURE_OPENAI_DEPLOYMENT_NAME
 
         )
+
+
+    @staticmethod
+    def _normalize_endpoint(endpoint: str) -> str:
+        """
+        Normalize Azure OpenAI resource endpoint.
+
+        The Azure SDK expects the bare resource host (for example
+        https://my-resource.openai.azure.com). If the configured URL
+        includes /openai or /openai/v1, strip that suffix.
+        """
+        if not endpoint:
+            return endpoint
+
+        parsed = urlparse(endpoint)
+        path = parsed.path.rstrip("/")
+
+        if path.endswith("/openai/v1"):
+            path = path[: -len("/openai/v1")]
+        elif path.endswith("/openai"):
+            path = path[: -len("/openai")]
+
+        return parsed._replace(path=path).geturl()
 
 
 

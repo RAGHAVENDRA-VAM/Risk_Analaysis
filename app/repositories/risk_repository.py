@@ -120,89 +120,37 @@ class RiskRepository:
 
     def save_findings(
         self,
-        analysis_id: int,
+        commit_id: str,
         findings: list
     ):
 
-
         saved_findings = []
 
-
-
         for finding in findings:
-
-
             risk_finding = RiskFinding(
-
-                analysis_id=
-                    analysis_id,
-
-
-                rule_name=
-                    finding.get(
-                        "rule_name"
-                    ),
-
-
-                category=
-                    finding.get(
-                        "rule_category"
-                    ),
-
-
-                severity=
-                    finding.get(
-                        "severity"
-                    ),
-
-
-                risk_score=
-                    finding.get(
-                        "risk_score"
-                    ),
-
-
-                description=
-                    finding.get(
-                        "description"
-                    ),
-
-
-                recommendation=
-                    finding.get(
-                        "recommendation"
-                    ),
-
-
-                blocking=
-                    finding.get(
-                        "is_blocking"
-                    ),
-
-
-                created_at=
-                    datetime.utcnow()
-
+                commit_id=commit_id,
+                file_path=finding.get("file_path"),
+                rule_name=(
+                    finding.get("rule")
+                    or finding.get("rule_name")
+                ),
+                category=(
+                    finding.get("rule_category")
+                    or finding.get("category")
+                ),
+                title=finding.get("title"),
+                description=finding.get("description"),
+                severity=finding.get("severity"),
+                risk_score=finding.get("risk_score"),
+                status="OPEN",
+                created_at=datetime.utcnow()
             )
 
-
-            self.db.add(
-                risk_finding
-            )
-
-
-            saved_findings.append(
-                risk_finding
-            )
-
-
+            self.db.add(risk_finding)
+            saved_findings.append(risk_finding)
 
         self.db.commit()
-
-
-
         return saved_findings
-
 
 
 
@@ -224,7 +172,6 @@ class RiskRepository:
         )
 
 
-
         findings = (
 
             analysis_result.get(
@@ -238,19 +185,16 @@ class RiskRepository:
         )
 
 
+        saved_findings = self.save_findings(
 
-        self.save_findings(
-
-            analysis.id,
+            analysis.commit_id,
 
             findings
 
         )
 
 
-
-        return analysis
-
+        return analysis, saved_findings
 
 
 

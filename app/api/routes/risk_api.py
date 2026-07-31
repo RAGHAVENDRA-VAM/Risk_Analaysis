@@ -60,7 +60,7 @@ class PRAnalyzeRequest(BaseModel):
 
 
 @router.post("/analyze")
-async def analyze_pull_request(request: PRAnalyzeRequest):
+async def analyze_pull_request(request: PRAnalyzeRequest, db=Depends(get_db)):
     """
     Triggered by the Azure DevOps extension when a PR is opened.
     Runs rule engine + AI analysis and returns risk result.
@@ -72,6 +72,22 @@ async def analyze_pull_request(request: PRAnalyzeRequest):
             branch=request.sourceBranch,
             changed_files=request.files
         )
+
+        repository = RiskRepository(db)
+        analysis, saved_findings = repository.save_complete_analysis(result)
+
+        finding_lookup = {
+            finding.rule_name: finding.id
+            for finding in saved_findings
+            if finding.rule_name
+        }
+
+        RecommendationRepository(db).save_recommendations(
+            result["commit_id"],
+            result["recommendations"],
+            finding_lookup
+        )
+
         return {
             "riskScore": result["risk_score"],
             "severity": result["severity"],
