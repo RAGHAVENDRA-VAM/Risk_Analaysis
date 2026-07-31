@@ -36,69 +36,19 @@ class FindingRepository:
 
     def save_finding(
         self,
-        analysis_id: int,
+        commit_id: str,
         finding: dict
     ):
 
-
         risk_finding = RiskFinding(
-
-            analysis_id=
-                analysis_id,
-
-
-            rule_name=
-                finding.get(
-                    "rule_name"
-                ),
-
-
-            category=
-                finding.get(
-                    "rule_category"
-                ),
-
-
-            severity=
-                finding.get(
-                    "severity"
-                ),
-
-
-            risk_score=
-                finding.get(
-                    "risk_score"
-                ),
-
-
-            description=
-                finding.get(
-                    "description"
-                ),
-
-
-            recommendation=
-                finding.get(
-                    "recommendation"
-                ),
-
-
-            matched_pattern=
-                finding.get(
-                    "matched_pattern"
-                ),
-
-
-            blocking=
-                finding.get(
-                    "is_blocking",
-                    False
-                ),
-
-
-            created_at=
-                datetime.utcnow()
-
+            commit_id=commit_id,
+            rule_name=finding.get("rule_name"),
+            category=finding.get("rule_category"),
+            severity=finding.get("severity"),
+            risk_score=finding.get("risk_score"),
+            description=finding.get("description"),
+            status="OPEN",
+            created_at=datetime.utcnow()
         )
 
 
@@ -123,34 +73,18 @@ class FindingRepository:
 
     def save_findings(
         self,
-        analysis_id: int,
+        commit_id: str,
         findings: list
     ):
 
-
         saved = []
 
-
         for finding in findings:
-
-
-            result = (
-
-                self.save_finding(
-
-                    analysis_id,
-
-                    finding
-
-                )
-
+            result = self.save_finding(
+                commit_id,
+                finding
             )
-
-
-            saved.append(
-                result
-            )
-
+            saved.append(result)
 
         return saved
 
@@ -158,34 +92,22 @@ class FindingRepository:
 
 
 
-    def get_findings_by_analysis(
+    def get_findings_by_commit(
         self,
-        analysis_id: int
+        commit_id: str
     ):
 
-
         return (
-
             self.db.query(
                 RiskFinding
             )
-
             .filter(
-
-                RiskFinding.analysis_id
-                ==
-                analysis_id
-
+                RiskFinding.commit_id == commit_id
             )
-
             .order_by(
-
                 RiskFinding.risk_score.desc()
-
             )
-
             .all()
-
         )
 
 
@@ -229,29 +151,14 @@ class FindingRepository:
         self
     ):
 
-
         return (
-
             self.db.query(
                 RiskFinding
             )
-
-            .filter(
-
-                RiskFinding.blocking
-                ==
-                True
-
-            )
-
             .order_by(
-
                 RiskFinding.created_at.desc()
-
             )
-
             .all()
-
         )
 
 
@@ -375,30 +282,20 @@ class FindingRepository:
 
 
 
-    def delete_analysis_findings(
+    def delete_commit_findings(
         self,
-        analysis_id: int
+        commit_id: str
     ):
 
-
         (
-
             self.db.query(
                 RiskFinding
             )
-
             .filter(
-
-                RiskFinding.analysis_id
-                ==
-                analysis_id
-
+                RiskFinding.commit_id == commit_id
             )
-
             .delete()
-
         )
-
 
         self.db.commit()
 

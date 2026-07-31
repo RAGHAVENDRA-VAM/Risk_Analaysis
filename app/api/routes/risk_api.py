@@ -238,9 +238,9 @@ async def get_findings(
 
 
 
-    findings = repository.get_findings_by_analysis(
+    findings = repository.get_findings_by_commit(
 
-        analysis.id
+        analysis.commit_id
 
     )
 

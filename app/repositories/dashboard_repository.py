@@ -159,25 +159,16 @@ class DashboardRepository:
         self
     ):
 
-
         return (
-
             self.db.query(
                 func.count(
                     RiskAnalysis.id
                 )
             )
-
             .filter(
-
-                RiskAnalysis.deployment_blocked
-                ==
-                True
-
+                RiskAnalysis.decision == "BLOCK_DEPLOYMENT"
             )
-
             .scalar()
-
         )
 
 

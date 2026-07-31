@@ -64,9 +64,7 @@ class RiskAnalysis(Base):
     )
 
 
-
     rule_score = Column(
-
         Integer
 
     )
@@ -104,9 +102,7 @@ class RiskAnalysis(Base):
     )
 
 
-
     ai_summary = Column(
-
         Text
 
     )

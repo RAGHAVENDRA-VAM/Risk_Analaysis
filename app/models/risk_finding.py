@@ -55,13 +55,11 @@ class RiskFinding(Base):
     )
 
 
-
     file_path = Column(
 
         String(500)
 
     )
-
 
 
     rule_name = Column(
@@ -111,7 +109,6 @@ class RiskFinding(Base):
     )
 
 
-
     status = Column(
 
         String(50),
@@ -119,7 +116,6 @@ class RiskFinding(Base):
         default="OPEN"
 
     )
-
 
 
     created_at = Column(

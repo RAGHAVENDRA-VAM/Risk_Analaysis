@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 
@@ -41,60 +42,17 @@ class RiskRepository:
         analysis_data: dict
     ):
 
-
         analysis = RiskAnalysis(
-
-            commit_id=
-                analysis_data.get(
-                    "commit_id"
-                ),
-
-
-            repository=
-                analysis_data.get(
-                    "repository"
-                ),
-
-
-            branch=
-                analysis_data.get(
-                    "branch"
-                ),
-
-
-            risk_score=
-                analysis_data.get(
-                    "risk_score"
-                ),
-
-
-            risk_level=
-                analysis_data.get(
-                    "risk_level"
-                ),
-
-
-            deployment_decision=
-                analysis_data.get(
-                    "deployment_decision"
-                ),
-
-
-            deployment_blocked=
-                analysis_data.get(
-                    "deployment_blocked"
-                ),
-
-
-            approval_required=
-                analysis_data.get(
-                    "approval_required"
-                ),
-
-
-            created_at=
-                datetime.utcnow()
-
+            commit_id=analysis_data.get("commit_id"),
+            repository_name=analysis_data.get("repository"),
+            rule_score=analysis_data.get("rule_score"),
+            ai_score=analysis_data.get("ai_score"),
+            risk_score=analysis_data.get("risk_score"),
+            severity=analysis_data.get("severity"),
+            decision=analysis_data.get("decision"),
+            ai_summary=json.dumps(analysis_data.get("ai_analysis", {})),
+            confidence=analysis_data.get("ai_analysis", {}).get("confidence", 0.0),
+            created_at=datetime.utcnow()
         )
 
 

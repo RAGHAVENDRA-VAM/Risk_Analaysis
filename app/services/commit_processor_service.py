@@ -26,13 +26,26 @@ class CommitProcessorService:
         # Step 1 - Build context
         context = self.context_builder.build_context(commit_data)
 
-        # Step 2 - Store commit
-        commit = self.commit_repository.create({
-            "commit_id": context["commit_id"],
-            "author": context["author"],
-            "commit_message": context["message"],
-            "status": "PROCESSING"
-        })
+        commit = self.commit_repository.get_by_commit_id(
+            context["commit_id"]
+        )
+
+        if commit:
+            logger.info(
+                f"Commit already exists: {commit.commit_id}. Updating status to PROCESSING."
+            )
+            self.commit_repository.update_status(
+                commit.commit_id,
+                "PROCESSING"
+            )
+        else:
+            # Step 2 - Store commit
+            commit = self.commit_repository.create({
+                "commit_id": context["commit_id"],
+                "author": context["author"],
+                "commit_message": context["message"],
+                "status": "PROCESSING"
+            })
 
         # Step 3 - Prepare risk analysis input
         analysis_request = {
