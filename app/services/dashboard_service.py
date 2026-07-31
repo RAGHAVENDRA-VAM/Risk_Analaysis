@@ -42,8 +42,8 @@ class DashboardService:
             RiskCommitSchema(
                 commit_id=item.commit_id,
                 risk_score=item.risk_score,
-                risk_level=item.risk_level,
-                blocked=item.deployment_blocked
+                risk_level=item.severity,
+                blocked=(item.decision == "BLOCK_DEPLOYMENT")
             )
             for item in commits
         ]

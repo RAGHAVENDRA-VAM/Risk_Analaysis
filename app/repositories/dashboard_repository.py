@@ -95,7 +95,7 @@ class DashboardRepository:
 
             self.db.query(
 
-                RiskAnalysis.risk_level,
+                RiskAnalysis.severity,
 
                 func.count(
                     RiskAnalysis.id
@@ -105,7 +105,7 @@ class DashboardRepository:
 
             .group_by(
 
-                RiskAnalysis.risk_level
+                RiskAnalysis.severity
 
             )
 

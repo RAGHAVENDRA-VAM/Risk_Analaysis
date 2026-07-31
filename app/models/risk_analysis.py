@@ -108,13 +108,11 @@ class RiskAnalysis(Base):
     )
 
 
-
     confidence = Column(
 
         Float
 
     )
-
 
 
     created_at = Column(
