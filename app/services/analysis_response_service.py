@@ -59,9 +59,21 @@ class AnalysisResponseService:
         scores = {"security": 0, "terraform": 0, "pipeline": 0, "kubernetes": 0, "docker": 0}
         for finding in findings:
             category = finding["category"].lower()
-            key = "security" if category == "security" else "terraform" if category == "infrastructure" else "pipeline" if category in {"ci/cd", "pipeline"} else "kubernetes" if category == "kubernetes" else "docker" if "docker" in finding["filePath"].lower() else None
-            if key:
-                scores[key] = max(scores[key], 100 if finding["severity"] in {"Critical", "High"} else 60 if finding["severity"] == "Medium" else 25)
+            file_path = finding["filePath"].lower()
+            
+            # Smart category inference since AI often defaults to "Security"
+            if "docker" in file_path or "docker" in category:
+                key = "docker"
+            elif "kubernetes" in category or "deployment.yaml" in file_path or "k8s" in file_path:
+                key = "kubernetes"
+            elif "pipeline" in category or "ci/cd" in category or "azure-pipelines" in file_path or ".github/workflows" in file_path:
+                key = "pipeline"
+            elif "infrastructure" in category or "terraform" in category or file_path.endswith(".tf"):
+                key = "terraform"
+            else:
+                key = "security"
+                
+            scores[key] = max(scores[key], 100 if finding["severity"] in {"Critical", "High"} else 60 if finding["severity"] == "Medium" else 25)
         return scores
 
 
