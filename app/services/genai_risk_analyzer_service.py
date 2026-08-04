@@ -127,17 +127,15 @@ Security Findings:
 )}
 
 
-Provide:
-
-1. Risk summary
-2. Business impact
-3. Technical explanation
-4. Remediation steps
-5. Risk confidence score
-
-
-Return JSON only.
-
+Return ONLY a JSON object with the exact following keys:
+{
+  "risk_level": "CRITICAL, HIGH, MEDIUM, or LOW",
+  "confidence": <float between 0.0 and 1.0>,
+  "summary": "<Risk summary>",
+  "business_impact": "<Business impact>",
+  "explanation": "<Technical explanation>",
+  "remediation": "<Remediation steps>"
+}
 """
 
 
