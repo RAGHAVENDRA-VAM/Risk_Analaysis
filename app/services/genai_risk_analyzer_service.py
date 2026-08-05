@@ -128,22 +128,14 @@ Security Findings:
 
 
 Return ONLY a JSON object with the exact following keys:
-<<<<<<< HEAD
 {{
-=======
-{
->>>>>>> 298615c0c0a69b5d8ea871e8ecc7f8ee32b385b8
   "risk_level": "CRITICAL, HIGH, MEDIUM, or LOW",
   "confidence": <float between 0.0 and 1.0>,
   "summary": "<Risk summary>",
   "business_impact": "<Business impact>",
   "explanation": "<Technical explanation>",
   "remediation": "<Remediation steps>"
-<<<<<<< HEAD
 }}
-=======
-}
->>>>>>> 298615c0c0a69b5d8ea871e8ecc7f8ee32b385b8
 """
 
 
