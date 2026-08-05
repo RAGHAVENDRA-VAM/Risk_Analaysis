@@ -127,17 +127,15 @@ Security Findings:
 )}
 
 
-Provide:
-
-1. Risk summary
-2. Business impact
-3. Technical explanation
-4. Remediation steps
-5. Risk confidence score
-
-
-Return JSON only.
-
+Return ONLY a JSON object with the exact following keys:
+{{
+  "risk_level": "CRITICAL, HIGH, MEDIUM, or LOW",
+  "confidence": <float between 0.0 and 1.0>,
+  "summary": "<Risk summary>",
+  "business_impact": "<Business impact>",
+  "explanation": "<Technical explanation>",
+  "remediation": "<Remediation steps>"
+}}
 """
 
 
@@ -215,14 +213,17 @@ Return JSON only.
 
 
             result = response.choices[0].message.content
-
-
-
-            return json.loads(
-
-                result
-
-            )
+            
+            # Clean up potential markdown formatting (```json ... ```)
+            if result.strip().startswith("```"):
+                lines = result.strip().split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                result = "\n".join(lines)
+                
+            return json.loads(result)
 
 
 

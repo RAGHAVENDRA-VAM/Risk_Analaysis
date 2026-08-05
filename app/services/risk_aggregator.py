@@ -101,31 +101,12 @@ class RiskAggregator:
 
 
 
-        confidence = (
-
-            ai_result.get(
-
-                "confidence",
-
-                0
-
-            )
-
-        )
-
-
-
-        risk_level = (
-
-            ai_result.get(
-
-                "risk_level",
-
-                ""
-
-            )
-
-        )
+        try:
+            confidence = float(ai_result.get("confidence", 0) or 0)
+        except (ValueError, TypeError):
+            confidence = 0.0
+            
+        risk_level = str(ai_result.get("risk_level", "") or "")
 
 
 
