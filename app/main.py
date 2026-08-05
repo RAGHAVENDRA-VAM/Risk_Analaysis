@@ -12,6 +12,7 @@ from app.middleware.error_handler import register_exception_handlers
 from app.api.routes.webhook_api import router as webhook_router
 from app.api.routes.risk_api import router as risk_router
 from app.api.routes.dashboard_api import router as dashboard_router
+from app.api.routes.auth_api import router as auth_router
 from app.core.config import settings
 
 logger = get_logger(__name__)
@@ -60,6 +61,7 @@ register_exception_handlers(app)
 app.include_router(webhook_router)
 app.include_router(risk_router)
 app.include_router(dashboard_router)
+app.include_router(auth_router)
 
 
 @app.get("/")
