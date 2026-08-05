@@ -213,14 +213,17 @@ Return ONLY a JSON object with the exact following keys:
 
 
             result = response.choices[0].message.content
-
-
-
-            return json.loads(
-
-                result
-
-            )
+            
+            # Clean up potential markdown formatting (```json ... ```)
+            if result.strip().startswith("```"):
+                lines = result.strip().split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                result = "\n".join(lines)
+                
+            return json.loads(result)
 
 
 
