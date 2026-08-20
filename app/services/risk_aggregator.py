@@ -76,13 +76,13 @@ class RiskAggregator:
 
 
         #
-        # Highest risk dominates
+        # Cumulative score capped at 100
         #
 
-        return max(
-
-            scores
-
+        total_score = sum(scores)
+        return min(
+            100,
+            total_score
         )
 
 
