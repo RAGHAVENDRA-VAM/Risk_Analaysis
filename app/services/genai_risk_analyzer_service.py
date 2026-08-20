@@ -14,6 +14,7 @@ from app.core.logging import (
     get_logger
 )
 
+# pyrefly: ignore [missing-import]
 from openai import AzureOpenAI
 
 
