@@ -43,68 +43,60 @@ class RiskAggregator:
         Convert AI confidence/risk
         into numeric score.
         """
-
         try:
             confidence = float(ai_result.get("confidence", 0) or 0)
         except (ValueError, TypeError):
             confidence = 0.0
 
         risk_level = str(ai_result.get("risk_level", "") or "")
-
         multiplier = {"LOW": 30, "MEDIUM": 60, "HIGH": 80, "CRITICAL": 100}
-
         base_score = multiplier.get(risk_level.upper(), 0)
 
         return int(base_score * confidence)
 
-    def calculate_final_score(self, rule_score: int, ai_score: int):
+    def calculate_final_score(self, rule_score: int, ai_score: int, ai_result: Dict = None):
         """
         Combine rule and AI score.
         """
+        # If AI analysis is unavailable, failed, or has 0 confidence, rely 100% on the rule engine
+        risk_level = ai_result.get("risk_level", "").upper() if ai_result else ""
+        confidence = float(ai_result.get("confidence", 0) if ai_result else 0)
+        
+        if not ai_result or risk_level == "UNKNOWN" or confidence == 0:
+            return rule_score
 
         final_score = (rule_score * 0.7) + (ai_score * 0.3)
-
         return round(final_score)
 
     def get_severity(self, score: int):
         """
         Convert score to severity.
         """
-
         if score >= 86:
             return "CRITICAL"
-
         if score >= 61:
             return "HIGH"
-
         if score >= 31:
             return "MEDIUM"
-
         return "LOW"
 
     def get_decision(self, score: int):
         """
         Deployment decision.
         """
-
         if score >= self.block_threshold:
             return "BLOCK_DEPLOYMENT"
-
         if score >= self.warning_threshold:
             return "REQUIRE_APPROVAL"
-
         return "ALLOW_DEPLOYMENT"
 
     def aggregate(self, findings: List[Dict], ai_result: Dict):
         """
         Generate final risk decision.
         """
-
         rule_score = self.calculate_rule_score(findings)
-
         ai_score = self.calculate_ai_score(ai_result)
-
-        final_score = self.calculate_final_score(rule_score, ai_score)
+        final_score = self.calculate_final_score(rule_score, ai_score, ai_result)
 
         result = {
             "rule_score": rule_score,

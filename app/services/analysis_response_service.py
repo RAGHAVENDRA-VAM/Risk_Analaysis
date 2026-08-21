@@ -73,7 +73,8 @@ class AnalysisResponseService:
             else:
                 key = "security"
                 
-            scores[key] = max(scores[key], 100 if finding["severity"] in {"Critical", "High"} else 60 if finding["severity"] == "Medium" else 25)
+            severity = finding.get("severity", "Low").title()
+            scores[key] = max(scores[key], 100 if severity in {"Critical", "High"} else 60 if severity == "Medium" else 25)
         return scores
 
 
