@@ -203,9 +203,7 @@ Return ONLY a JSON object with the exact following keys:
                     }
 
                     ],
-
-
-                    temperature=0.2
+                    response_format={"type": "json_object"}
 
                 )
 
