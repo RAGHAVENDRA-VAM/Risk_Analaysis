@@ -29,7 +29,7 @@ class RiskAggregator:
         scores = []
 
         for finding in findings:
-            scores.append(finding.get("score", 0))
+            scores.append(finding.get("score", finding.get("risk_score", 0)))
 
         #
         # Cumulative score capped at 100
