@@ -229,28 +229,12 @@ Return ONLY a JSON object with the exact following keys:
 
 
         except Exception as error:
-
-
-            logger.error(
-
-                f"AI analysis failed {error}"
-
-            )
-
-
-
+            logger.error(f"AI analysis failed: {error}")
             return {
-
-
-                "risk_level":
-                "UNKNOWN",
-
-
-                "explanation":
-                "AI analysis unavailable",
-
-
-                "confidence":
-                0
-
+                "risk_level": "UNKNOWN",
+                "explanation": f"AI analysis failed: {str(error)}",
+                "confidence": 0,
+                "summary": f"Error: {str(error)}",
+                "business_impact": "Unknown due to AI failure",
+                "remediation": "Check Azure OpenAI configuration"
             }
