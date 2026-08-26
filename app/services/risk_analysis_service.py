@@ -5,6 +5,9 @@ from app.services.genai_risk_analyzer_service import GenAIRiskAnalyzer
 from app.services.risk_aggregator import RiskAggregator
 from app.services.recommendation_generator import RecommendationGenerator
 from app.agents import CoordinatorAgent
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class RiskAnalysisService:
@@ -61,6 +64,12 @@ class RiskAnalysisService:
             ai_result
         )
         agent_summary = self.coordinator.coordinate(rule_result.get("findings", []))
+
+        logger.info(
+            f"Audit Log: Analyzed commit_id={commit_id}, branch={branch}. "
+            f"Result: score={final_result['risk_score']}, severity={final_result['severity']}, "
+            f"decision={final_result['decision']}."
+        )
 
         return {
             "commit_id": commit_id,

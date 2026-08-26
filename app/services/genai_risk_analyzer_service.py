@@ -1,4 +1,5 @@
 import json
+import time
 from urllib.parse import urlparse
 
 from typing import (
@@ -170,46 +171,33 @@ Return ONLY a JSON object with the exact following keys:
 
 
         try:
-
-
+            start_time = time.time()
             response = (
-
                 self.client.chat.completions.create(
-
                     model=self.deployment,
-
-
                     messages=[
-
                     {
-
                     "role":
                     "system",
-
                     "content":
                     "You are a DevSecOps AI assistant."
-
                     },
-
-
                     {
-
                     "role":
                     "user",
-
                     "content":
                     prompt
-
                     }
-
                     ],
                     response_format={"type": "json_object"}
-
                 )
-
             )
 
-
+            latency_ms = int((time.time() - start_time) * 1000)
+            
+            input_tokens = response.usage.prompt_tokens if response.usage else 0
+            output_tokens = response.usage.completion_tokens if response.usage else 0
+            total_tokens = response.usage.total_tokens if response.usage else 0
 
             result = response.choices[0].message.content
             
@@ -222,7 +210,18 @@ Return ONLY a JSON object with the exact following keys:
                     lines = lines[:-1]
                 result = "\n".join(lines)
                 
-            return json.loads(result)
+            parsed_result = json.loads(result)
+            
+            # Add token usage metrics to the result payload
+            parsed_result["token_usage"] = {
+                "model_name": self.deployment,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": total_tokens,
+                "latency_ms": latency_ms
+            }
+            
+            return parsed_result
 
 
 

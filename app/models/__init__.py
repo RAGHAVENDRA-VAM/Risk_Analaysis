@@ -14,6 +14,7 @@ from app.models.risk_finding import RiskFinding
 from app.models.recommendation import Recommendation
 from app.models.audit_log import AuditLog
 from app.models.analysis_history import AnalysisHistory
+from app.models.ai_token_usage import AITokenUsage
 
 __all__ = [
     "Commit",
@@ -23,5 +24,6 @@ __all__ = [
     "RiskFinding",
     "Recommendation",
     "AuditLog",
-    "AnalysisHistory"
+    "AnalysisHistory",
+    "AITokenUsage"
 ]
