@@ -214,6 +214,15 @@ class RuleEngineService:
                 if extension in [".bicep", ".json", ".sh", ".ps1"] or "ansible" in file_path.lower() or "jenkinsfile" in file_path.lower():
                     selected_rules.append(rule)
 
+            elif category == "DB Impact Risk":
+                if extension == ".sql":
+                    selected_rules.append(rule)
+
+            elif category == "Dependency Compatibility Risk":
+                basename = os.path.basename(file_path).lower()
+                if basename in ["package.json", "requirements.txt", "pom.xml"]:
+                    selected_rules.append(rule)
+
 
 
         return selected_rules
