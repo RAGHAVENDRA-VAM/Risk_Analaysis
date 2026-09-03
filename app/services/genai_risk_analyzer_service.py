@@ -111,9 +111,9 @@ class GenAIRiskAnalyzer:
 
 You are a senior DevSecOps engineer.
 
-Analyze the following deployment change.
+Analyze the following deployment change. The Commit Context includes the raw source code of the changed files. You must perform a deep static code analysis on these files for any programming language present to identify security vulnerabilities, logical bugs, and anti-patterns, even if no Security Findings were reported by the deterministic rules.
 
-Commit Context:
+Commit Context (including changed files):
 
 {json.dumps(
     context,

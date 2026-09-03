@@ -183,25 +183,14 @@ class RuleEngineService:
 
             elif category == "Code Quality":
 
-
-                if extension in [
-
-                    ".py",
-
-                    ".java",
-
-                    ".cs",
-
-                    ".js",
-
-                    ".ts",
-
-                    ".jsx",
-
-                    ".tsx"
-
-                ]:
-
+                # Fallback: Apply generic text heuristics to all non-binary files
+                binary_extensions = [
+                    ".jpg", ".jpeg", ".png", ".gif", ".pdf", 
+                    ".zip", ".tar", ".gz", ".exe", ".dll", ".so", ".bin",
+                    ".class", ".pyc"
+                ]
+                
+                if extension and extension not in binary_extensions:
                     selected_rules.append(
                         rule
                     )

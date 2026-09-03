@@ -164,12 +164,7 @@ def check_debug_statements(
 
         "print(",
 
-        "console.log",
-
-        "debugger",
-
-        "System.out.println"
-
+        "console.log"
     ]
 
 
@@ -308,10 +303,7 @@ def check_empty_exception_handling(
 
         "except:",
 
-        "catch(Exception",
-
-        "catch (Exception"
-
+        "catch"
     ]
 
 

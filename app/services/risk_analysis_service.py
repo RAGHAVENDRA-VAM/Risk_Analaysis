@@ -48,7 +48,7 @@ class RiskAnalysisService:
 
         # Step 2 - Generate AI analysis
         ai_result = self.ai_analyzer.analyze(
-            {"commit_id": commit_id, "branch": branch},
+            {"commit_id": commit_id, "branch": branch, "changed_files": changed_files},
             rule_result.get("findings", [])
         )
 
