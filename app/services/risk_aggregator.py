@@ -20,23 +20,40 @@ class RiskAggregator:
 
     def calculate_rule_score(self, findings: List[Dict]):
         """
-        Calculate score from rules.
+        Calculate realistic score from rules based on actual highest severity and weighted findings.
+        Avoids inflating score to 100 when only small or single issues exist.
         """
-
         if not findings:
             return 0
 
-        scores = []
+        # Base maximum severity anchor
+        severity_weights = {
+            "CRITICAL": 85,
+            "HIGH": 65,
+            "MEDIUM": 40,
+            "LOW": 15
+        }
 
-        for finding in findings:
-            scores.append(finding.get("score", finding.get("risk_score", 0)))
-
-        #
-        # Cumulative score capped at 100
-        #
-
-        total_score = sum(scores)
-        return min(100, total_score)
+        severities = [f.get("severity", "LOW").upper() for f in findings]
+        
+        # Max severity sets the baseline bracket
+        if "CRITICAL" in severities:
+            base = 85
+            # Add minor delta for additional critical issues up to 100
+            extra = (severities.count("CRITICAL") - 1) * 5 + severities.count("HIGH") * 2
+            return min(100, base + extra)
+        elif "HIGH" in severities:
+            base = 65
+            extra = (severities.count("HIGH") - 1) * 5 + severities.count("MEDIUM") * 2
+            return min(80, base + extra)
+        elif "MEDIUM" in severities:
+            base = 40
+            extra = (severities.count("MEDIUM") - 1) * 3
+            return min(60, base + extra)
+        else:
+            base = 15
+            extra = len(findings) * 2
+            return min(30, base + extra)
 
     def calculate_ai_score(self, ai_result: Dict):
         """
