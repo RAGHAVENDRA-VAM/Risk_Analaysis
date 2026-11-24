@@ -14,9 +14,22 @@ class AnalysisResponseService:
 
     def to_client_response(self, result: dict[str, Any]) -> dict[str, Any]:
         recommendation_by_rule = {item.get("rule"): item for item in result.get("recommendations", [])}
+        ai_analysis = result.get("ai_analysis") or {}
+        ai_explanation = ai_analysis.get("explanation")
+        ai_remediation = ai_analysis.get("remediation")
+        ai_business_impact = ai_analysis.get("business_impact")
+
         findings = []
         for index, finding in enumerate(result.get("findings", []), start=1):
             recommendation = recommendation_by_rule.get(finding.get("rule") or finding.get("rule_name"), {})
+            
+            # Combine deterministic advice with real AI-generated remediation
+            rec_text = finding.get("recommendation") or "\n".join(recommendation.get("recommendations", []))
+            if ai_remediation and not ai_remediation.startswith("Error") and not ai_remediation.startswith("Check Azure"):
+                rec_text = f"{rec_text}\n\n🤖 AI Remediation:\n{ai_remediation}".strip()
+
+            impact_text = finding.get("business_impact") or ai_business_impact or "Potential production security or reliability impact."
+
             findings.append({
                 "id": finding.get("id", index),
                 "severity": finding.get("severity", "Low"),
@@ -26,10 +39,11 @@ class AnalysisResponseService:
                 "lineNumber": self._line_number(finding),
                 "title": finding.get("title") or finding.get("rule", "Risk finding"),
                 "description": finding.get("description", ""),
-                "businessImpact": finding.get("business_impact", "Potential production security or reliability impact."),
+                "businessImpact": impact_text,
+                "aiExplanation": ai_explanation,
                 "compliance": recommendation.get("compliance", ["CIS", "OWASP"]),
                 "estimatedFixTime": recommendation.get("estimated_fix_time", "15 minutes"),
-                "recommendation": finding.get("recommendation") or "\n".join(recommendation.get("recommendations", ["Review the recommended remediation."])),
+                "recommendation": rec_text,
                 "suggestedCodeFix": finding.get("suggested_code_fix") or recommendation.get("suggested_code_fix"),
                 "referenceLinks": finding.get("reference_links") or recommendation.get("reference_links", []),
             })
