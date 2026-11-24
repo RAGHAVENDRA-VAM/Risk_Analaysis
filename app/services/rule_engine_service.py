@@ -239,6 +239,8 @@ class RuleEngineService:
 
 
 
+        lines = file_content.splitlines()
+
         for rule in applicable_rules:
 
 
@@ -255,6 +257,27 @@ class RuleEngineService:
 
             )
 
+            # Enrich findings with accurate line numbers and file path
+            for item in results:
+                if not item.get("file_path") and not item.get("file") and not item.get("path"):
+                    item["file_path"] = file_path
+                
+                # If rule didn't compute an exact line number, calculate it dynamically from matched pattern or keywords
+                if not item.get("line_number") or item.get("line_number") == 1:
+                    needle = item.get("matched_pattern") or item.get("pattern") or ""
+                    if needle:
+                        found_line = next((idx for idx, val in enumerate(lines, 1) if str(needle).strip() in val), None)
+                        if found_line:
+                            item["line_number"] = found_line
+                    
+                    if not item.get("line_number") or item.get("line_number") == 1:
+                        # Fallback: scan for any keyword in description or title
+                        terms = [t for t in (item.get("title", "") + " " + item.get("description", "")).split() if len(t) > 3 and t.isalnum()]
+                        for term in terms:
+                            found = next((idx for idx, val in enumerate(lines, 1) if term.lower() in val.lower()), None)
+                            if found:
+                                item["line_number"] = found
+                                break
 
             findings.extend(
                 results
