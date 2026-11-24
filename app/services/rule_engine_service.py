@@ -291,6 +291,21 @@ class RuleEngineService:
 
 
 
+    def load_repo_policy(self, files: list) -> dict:
+        """
+        Loads .riskrc, .risk-policy.json, or .devops-risk.json if present in repo files.
+        Allows enterprise teams to override thresholds and ignore specific rules.
+        """
+        import json
+        for file in files:
+            path = file.get("path", "").lower()
+            if any(cfg in path for cfg in [".riskrc", ".risk-policy.json", ".devops-risk.json"]):
+                try:
+                    return json.loads(file.get("content", "{}"))
+                except Exception:
+                    pass
+        return {}
+
     def analyze_files(
         self,
         files: list
@@ -312,6 +327,9 @@ class RuleEngineService:
 
 
         all_findings = []
+        policy = self.load_repo_policy(files)
+        ignored_rules = set(policy.get("ignore_rules", []))
+        severity_overrides = policy.get("severity_overrides", {})
 
 
 
@@ -330,9 +348,20 @@ class RuleEngineService:
 
             )
 
+            # Apply Enterprise Policy Overrides and Ignores
+            filtered_findings = []
+            for finding in findings:
+                rule_name = finding.get("rule") or finding.get("rule_name")
+                if rule_name in ignored_rules:
+                    continue
+                if rule_name in severity_overrides:
+                    finding["severity"] = severity_overrides[rule_name]
+
+                filtered_findings.append(finding)
+
 
             all_findings.extend(
-                findings
+                filtered_findings
             )
 
 
