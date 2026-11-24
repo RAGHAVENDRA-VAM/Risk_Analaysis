@@ -86,22 +86,13 @@ def check_hardcoded_urls(
 
     findings = []
 
+    # Detect real static domain URLs, ignore schema definitions, localhosts, and shell variable templates like https://$URL
+    pattern = r'https?://[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,}(?:/[^\s\"\'\$\)]*)?'
 
-    pattern = (
-
-        r"https?://[^\s\"']+"
-
-    )
-
-
-    matches = re.findall(
-
-        pattern,
-
-        file_content
-
-    )
-
+    all_matches = re.findall(pattern, file_content)
+    # Filter out schemas, doc urls, standard registries and variable interpolations
+    ignored = ["schemas.microsoft.com", "schema.management.azure.com", "w3.org", "json-schema.org", "registry.npmjs.org", "pypi.org"]
+    matches = [m for m in all_matches if not any(ign in m.lower() for ign in ignored) and not "$" in m]
 
     if matches:
 

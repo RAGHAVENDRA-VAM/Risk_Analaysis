@@ -228,78 +228,44 @@ class SecurityRules:
     ):
 
         """
-        Detect API keys and tokens.
+        Detect real API keys and tokens in source code.
+        Distinguishes real secrets from variable names, placeholders, and definitions.
         """
-
-
 
         findings = []
 
+        import re
 
-
-        keywords = [
-
-            "api_key",
-
-            "apikey",
-
-            "secret_key",
-
-            "access_token",
-
-            "client_secret"
-
+        secret_patterns = [
+            # Real key assignments like api_key = "sk_live_1234567890abcdef"
+            r'(?i)(?:api_key|apikey|secret_key|access_token|client_secret)\s*[:=]\s*["\']([^"\'\$\(\)\{\}\s]{10,})["\']',
+            # AWS Access Key ID
+            r'AKIA[0-9A-Z]{16}',
+            # GitHub Personal Access Token
+            r'ghp_[a-zA-Z0-9]{36}',
+            # Private keys
+            r'-----BEGIN (?:RSA )?PRIVATE KEY-----',
+            # Azure Storage Connection Strings with key
+            r'DefaultEndpointsProtocol=https;AccountName=[^;]+;AccountKey=[a-zA-Z0-9+/=]{40,}'
         ]
 
-
-
-        for keyword in keywords:
-
-
-            if keyword.lower() in content.lower():
-
-
-                findings.append(
-
-                    {
-
-
-                    "rule":
-
-                        "SEC_SECRET_EXPOSURE",
-
-
-                    "title":
-
-                        "Sensitive Secret Detected",
-
-
-                    "severity":
-
-                        "CRITICAL",
-
-
-                    "score":
-
-                        100,
-
-
-                    "file":
-
-                        path,
-
-
-                    "description":
-
-                        "Possible API key or secret found"
-
-
-                    }
-
-                )
-
-
-                break
+        for pattern in secret_patterns:
+            matches = re.findall(pattern, content)
+            if matches:
+                # Ensure the matched string isn't just a dummy placeholder like 'your_api_key_here'
+                val = str(matches[0]).lower()
+                if not any(placeholder in val for placeholder in ["your", "dummy", "placeholder", "xxx", "todo"]):
+                    findings.append(
+                        {
+                            "rule": "SEC_SECRET_EXPOSURE",
+                            "title": "Sensitive Secret Detected",
+                            "severity": "CRITICAL",
+                            "score": 100,
+                            "file": path,
+                            "description": "Exposed credentials or hardcoded secret detected"
+                        }
+                    )
+                    break
 
 
 

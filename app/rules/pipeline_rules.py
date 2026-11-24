@@ -105,64 +105,41 @@ class PipelineRules:
     ):
 
         """
-        Detect secrets in pipeline files.
+        Detect real secrets in pipeline files.
+        Distinguishes real secrets from variable expressions like $(SECRET) or $VAR.
         """
 
         findings = []
 
+        import re
 
-        keywords = [
-
-            "password",
-
-            "client_secret",
-
-            "access_token",
-
-            "api_key",
-
-            "connection_string"
-
+        secret_patterns = [
+            # High-entropy raw API keys, bearer tokens, or secrets assigned in plaintext
+            r'(?i)(?:password|client_secret|access_token|api_key|secret_key)\s*[:=]\s*["\']([^"\'\$\(\)\{\}\s]{8,})["\']',
+            r'(?i)(?:password|client_secret|access_token|api_key)\s*[:=]\s*([a-zA-Z0-9_\-]{16,})',
+            # Azure / AWS / GitHub token signatures
+            r'ghp_[a-zA-Z0-9]{36}',
+            r'AKIA[0-9A-Z]{16}',
+            r'DefaultEndpointsProtocol=https;AccountName=[^;]+;AccountKey=[^;]+'
         ]
 
-
-        for keyword in keywords:
-
-            if keyword.lower() in content.lower():
-
-                findings.append(
-
-                    {
-
-                    "rule":
-                        "PIPELINE_SECRET_EXPOSURE",
-
-
-                    "title":
-                        "Secret Found In Pipeline",
-
-
-                    "severity":
-                        "CRITICAL",
-
-
-                    "score":
-                        100,
-
-
-                    "file":
-                        path,
-
-
-                    "description":
-                        "Sensitive value detected in pipeline YAML"
-
-                    }
-
-                )
-
-                break
-
+        for pattern in secret_patterns:
+            matches = re.findall(pattern, content)
+            if matches:
+                # Ensure it's not a variable expansion
+                match_val = str(matches[0])
+                if not match_val.startswith(("$", "(", "{")):
+                    findings.append(
+                        {
+                            "rule": "PIPELINE_SECRET_EXPOSURE",
+                            "title": "Secret Found In Pipeline",
+                            "severity": "CRITICAL",
+                            "score": 100,
+                            "file": path,
+                            "description": "Raw sensitive secret value detected in pipeline YAML"
+                        }
+                    )
+                    break
 
         return findings
 
