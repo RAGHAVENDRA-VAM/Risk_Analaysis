@@ -62,7 +62,7 @@ def hash_password(
 
     return pwd_context.hash(
 
-        password
+        password[:72]
 
     )
 
@@ -83,7 +83,7 @@ def verify_password(
 
     return pwd_context.verify(
 
-        plain_password,
+        plain_password[:72],
 
         hashed_password
 
