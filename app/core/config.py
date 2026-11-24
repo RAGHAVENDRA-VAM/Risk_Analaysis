@@ -148,9 +148,12 @@ class Settings(
     )
 
 
+    #
+    # Token expiration (set to 1 year / 525600 minutes for developer tools and IDEs)
+    #
     ACCESS_TOKEN_EXPIRE_MINUTES: int = (
 
-        60
+        525600
 
     )
 
